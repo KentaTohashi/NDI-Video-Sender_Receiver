@@ -1,58 +1,38 @@
 ﻿#pragma once
-#include <malloc.h>
+
 #include <time.h>
 #include <iostream>
 #include <chrono>
 #include <string>
 #include <thread>
 #include <atomic>
-//#include <opencv/cv.hpp>    // cvtColor
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <Processing.NDI.Lib.h>
-
-/* linux動作用ヘッダ */
-#ifdef __linux__
-#include <csignal>
-#include <cstddef>
-#include <cstring>
-#include <cstdint>
-#include <cstdio>
 #include <cstdlib>
-#include <sys/time.h>
-#endif // __linux__
-
-/* Windows動作用ヘッダ */
-#ifdef _WIN32
-#include <signal.h>
-#endif
-
-
-#include <zbar.h>
-
-#define NDI_REC_MAX     6
+#include <vector>
+#include "ImageProcessing.h"
+#include "QRcodeRecognition.h"
 
 using namespace std;
-typedef enum _img_proc{
-    NONE,
+typedef enum _img_proc {
+    NONE = 0,
     QR
-}imageProcessing;
+} imageProcessingType;
 
 
-typedef struct{
-   string type;
-   string data;
-   vector <cv::Point> location;
-} decodedObject;
-class NdiCom
-{
+class NdiCom {
 public:
 
-    NdiCom(const int channel_no, const NDIlib_source_t& p_source);
+    NdiCom(const int channel_no, const NDIlib_source_t &p_source);
+
     ~NdiCom();
+
     bool GetIsRecFlg();
+
     void creatRecVideoThread();
+
     void DeleteRecVideoThread();
 
 private:
@@ -61,17 +41,16 @@ private:
     bool m_exit_rec_loop; // 受信ループ終了フラグ
     bool m_isRecv; // 受信フラグ
     bool m_isHighest; // 高解像度フラグ
-    bool m_is_realsense; // RealSenseカメラフラグ
     std::string m_str_resname; // リソース名格納用
     std::thread m_receive_thread; // 受信Thread用変数
     NDIlib_recv_instance_t m_pNDI_recv; // 受信用インスタンス
     NDIlib_metadata_frame_t camera_mode;//RealSenseカメラの動作モード切り替え
     cv::Mat m_rcvframe; // 受信用フレーム
-    imageProcessing img_proc;
+    imageProcessingType img_proc;
+
+    vector<ImageProcessing *> *imageProcessing;
 
     void recVideo();
-    void decode(cv::Mat &im, vector<decodedObject>&decodedObjects);
-    void writeDecodeResult(cv::Mat &im, vector<decodedObject>&decodedObjects);
- 
+
 };
 

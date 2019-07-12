@@ -18,14 +18,14 @@ add_executable(${PROJECT_NAME}
         ConfigRead.cpp
         NdiCom.cpp
         NdiVideoReceiver.cpp
-)
+        ImageProcessing.cpp ImageProcessing.h QRcodeRecognition.cpp QRcodeRecognition.h)
 target_link_libraries(${PROJECT_NAME} ${NDI_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${ZBAR_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} Threads::Threads)
-if(OpenCV_FOUND)
+if (OpenCV_FOUND)
     # インクルードパスを指定
-    include_directories(${OpenCV_INCLUDE_DIRS} )
+    include_directories(${OpenCV_INCLUDE_DIRS})
 
     # リンクするライブラリ指定
-    target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} )
-endif(OpenCV_FOUND)
+    target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
+endif (OpenCV_FOUND)

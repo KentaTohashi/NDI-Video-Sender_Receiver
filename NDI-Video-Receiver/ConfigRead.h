@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -14,20 +15,25 @@
 
 #define CONFIG_FILE_NAME "NdiVideoReceiver.config"
 
-class ConfigRead
-{
+class ConfigRead {
 public:
     ConfigRead();
+
     ~ConfigRead();
+
     std::string GetStringProperty(std::string op_name);
 
 private:
     std::string m_defvalue; // デフォルト値格納用
     int m_int_defvalue;
+
     // 設定項目番号格納用
     std::string getDefaultValue();
+
     void setDefaltValue(std::string op_name);
+
     std::string getProperty(std::string conf_data, std::string op_name);
+
     std::string readConfigFile(std::string op_name);
 };
 
