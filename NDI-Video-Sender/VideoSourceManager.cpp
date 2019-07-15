@@ -57,6 +57,10 @@ void VideoSourceManager::registSender(int sender_number) {
 bool VideoSourceManager::requestVideoSource(int sender_number, int camera_number) {
     //同時書き込み防止のためロック
     m.lock();
+    if (camera_number > sources->size()) {
+        m.unlock();
+        return false;
+    }
     bimap_t::right_iterator itr = thread_camera_map.right.find(thread_camera_map.left.at(sender_number));
     const bool successful_replace = thread_camera_map.right.replace_key(itr, camera_number - 1);
     m.unlock();
