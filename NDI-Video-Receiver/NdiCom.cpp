@@ -43,9 +43,10 @@ NdiCom::NdiCom(const int channel_no, const NDIlib_source_t &p_source)
     imageProcessing = new vector<ImageProcessing *>();
     auto none = new ImageProcessing();
     auto qr = new QRcodeRecognition();
+    auto motion = new MotionDetection();
     imageProcessing->push_back((ImageProcessing *) none);
     imageProcessing->push_back((ImageProcessing *) qr);
-
+    imageProcessing->push_back((ImageProcessing *) motion);
     // Start a thread to receive frames
     creatRecVideoThread(); // 受信用Threadの作成
 }
@@ -205,10 +206,22 @@ void NdiCom::recVideo() {
                     break;
 
                 case 'a':
+                    imageProcessing->at(img_proc)->onStopProcessing();
                     img_proc = imageProcessingType::NONE;
                     break;
                 case 's':
-                    img_proc = imageProcessingType::QR;
+                    if (img_proc != imageProcessingType::QR) {
+                        imageProcessing->at(img_proc)->onStopProcessing();
+                        img_proc = imageProcessingType::QR;
+                        imageProcessing->at(img_proc)->onStartProcessing();
+                    }
+                    break;
+                case 'd':
+                    if (img_proc != imageProcessingType::MOTION) {
+                        imageProcessing->at(img_proc)->onStopProcessing();
+                        img_proc = imageProcessingType::MOTION;
+                        imageProcessing->at(img_proc)->onStartProcessing();
+                    }
                     break;
 
                 default:

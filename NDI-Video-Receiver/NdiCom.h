@@ -14,11 +14,13 @@
 #include <vector>
 #include "ImageProcessing.h"
 #include "QRcodeRecognition.h"
+#include "MotionDetection.h"
 
 using namespace std;
 typedef enum _img_proc {
     NONE = 0,
-    QR
+    QR,
+    MOTION
 } imageProcessingType;
 
 

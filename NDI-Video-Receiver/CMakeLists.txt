@@ -18,7 +18,7 @@ add_executable(${PROJECT_NAME}
         ConfigRead.cpp
         NdiCom.cpp
         NdiVideoReceiver.cpp
-        ImageProcessing.cpp ImageProcessing.h QRcodeRecognition.cpp QRcodeRecognition.h)
+        ImageProcessing.cpp ImageProcessing.h QRcodeRecognition.cpp QRcodeRecognition.h MotionDetection.cpp MotionDetection.h)
 target_link_libraries(${PROJECT_NAME} ${NDI_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${ZBAR_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} Threads::Threads)

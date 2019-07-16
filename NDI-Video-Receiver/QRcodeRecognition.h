@@ -9,6 +9,7 @@
 #include <vector>
 #include <zbar.h>
 #include <opencv2/imgproc.hpp>
+#include <iostream>
 
 using namespace std;
 using namespace zbar;
@@ -19,6 +20,10 @@ public:
 
     void processImage(cv::Mat &mat) override;
 
+    void onStartProcessing() override;
+
+    void onStopProcessing() override;
+
     string getProcessingName() override;
 
 private:
@@ -28,9 +33,9 @@ private:
         vector<cv::Point> location;
     } decodedObject;
 
-    void decode(cv::Mat &im, vector<decodedObject> &decodedObjects);
+    static void decode(cv::Mat &im, vector<decodedObject> &decodedObjects);
 
-    void writeDecodeResult(cv::Mat &im, vector<decodedObject> &decodedObjects);
+    static void writeDecodeResult(cv::Mat &im, vector<decodedObject> &decodedObjects);
 };
 
 

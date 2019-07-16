@@ -18,6 +18,9 @@ public:
 
     virtual string getProcessingName();
 
+    virtual void onStartProcessing();
+
+    virtual void onStopProcessing();
 };
 
 

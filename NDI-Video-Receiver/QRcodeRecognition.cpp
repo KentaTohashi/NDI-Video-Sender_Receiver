@@ -31,12 +31,12 @@ void QRcodeRecognition::decode(cv::Mat &im, vector<QRcodeRecognition::decodedObj
 
 
     // 結果を格納
-    for (Image::SymbolIterator symbol = image.symbol_begin(); symbol != image.symbol_end(); ++symbol) {
+    for (zbar::SymbolIterator symbol = scanner.get_results().symbol_begin();
+         symbol != scanner.get_results().symbol_end(); ++symbol) {
         decodedObject obj;
 
         obj.type = symbol->get_type_name();
         obj.data = symbol->get_data();
-
 
         // 場所を格納
         for (int i = 0; i < symbol->get_location_size(); i++) {
@@ -80,4 +80,12 @@ void QRcodeRecognition::writeDecodeResult(cv::Mat &im, vector<QRcodeRecognition:
 
 string QRcodeRecognition::getProcessingName() {
     return "QR";
+}
+
+void QRcodeRecognition::onStartProcessing() {
+    ImageProcessing::onStartProcessing();
+}
+
+void QRcodeRecognition::onStopProcessing() {
+    ImageProcessing::onStopProcessing();
 }

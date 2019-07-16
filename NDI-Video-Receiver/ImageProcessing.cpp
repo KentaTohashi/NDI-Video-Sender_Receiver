@@ -13,3 +13,11 @@ string ImageProcessing::getProcessingName() {
     return "";
 }
 
+void ImageProcessing::onStartProcessing() {
+
+}
+
+void ImageProcessing::onStopProcessing() {
+
+}
+
