@@ -13,8 +13,8 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
     //引数の文字列を数値に変換
-    long camera_count = std::strtol(argv[1], NULL, 10);
-    long thread_count = std::strtol(argv[2], NULL, 10);
+    long camera_count = std::strtol(argv[1], nullptr, 10);
+    long thread_count = std::strtol(argv[2], nullptr, 10);
     if (camera_count == 0 || thread_count == 0) {
         cerr << "第一引数にカメラ数、第二引数に送信スレッド数を指定してください" << endl;
         return EXIT_FAILURE;

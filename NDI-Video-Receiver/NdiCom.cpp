@@ -187,6 +187,7 @@ void NdiCom::recVideo() {
                     camera_mode.p_data = new char[send_str.size() + 1];
                     strcpy(camera_mode.p_data, send_str.c_str());
                     NDIlib_recv_send_metadata(m_pNDI_recv, &camera_mode); // メタデータ送信
+                    delete camera_mode.p_data;
                     break;
                 case 'q': // RGB要求
                     camera_mode.p_data = "<RGB_mode enabled=\"true\"/>";
