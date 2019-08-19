@@ -39,17 +39,36 @@ void VideoSourceManager::addVideoSource(int camera_number) {
 }
 
 /***
+ * カメラデバイスのキャプチャを開始する
+ * @param camera_number  キャプチャ開始するカメラ番号
+ */
+void VideoSourceManager::atatchCamera(int camera_number)
+{
+	sources->at(camera_number - 1)->atatch();
+}
+
+/***
+ * カメラデバイスのキャプチャを停止する
+ * @param camera_number  キャプチャ停止するカメラ番号
+ */
+void VideoSourceManager::detatchCamera(int camera_number)
+{
+	sources->at(camera_number - 1)->detatch();
+}
+
+/***
  * 送信スレッドを登録する
  * @param sender_number  登録するスレッド番号
  */
 void VideoSourceManager::registSender(int sender_number) {
     //送信スレッドを登録する。初期状態ではスレッドと同じカメラ番号を登録しておく
+    atatchCamera(sender_number);
     thread_camera_map.insert(bimap_value_t(sender_number, sender_number - 1));
 }
 
 /**
  * スレッドに紐付いたカメラを切り替える
- * 別のスレッドと紐付いているカメラには切り替えられずfalseが返る
+ * 別のスレッドと紐付いているカメラまたは存在しないカメラには切り替えられずfalseが返る
  * @param sender_number スレッド番号
  * @param camera_number 受信したいカメラの番号
  * @return 切り替えに成功した場合true/失敗するとfalse
@@ -61,7 +80,9 @@ bool VideoSourceManager::requestVideoSource(int sender_number, int camera_number
     bimap_t::right_iterator itr = thread_camera_map.right.find(thread_camera_map.left.at(sender_number));
     if(camera_number <=  sources->size())
     {
+        detatchCamera(thread_camera_map.left.at(sender_number) + 1);
         successful_replace = thread_camera_map.right.replace_key(itr, camera_number - 1);
+        atatchCamera(camera_number);
     }
     m.unlock();
     return successful_replace;

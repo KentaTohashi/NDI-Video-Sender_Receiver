@@ -14,19 +14,12 @@ RealSense::RealSense(int camera_number):VideoSource(camera_number)
     str_int = "_CAM";
     str_int += to_string(camera_number); // 指定したカメラ番号を格納
 
-    rs2::config config; // RealSenseカメラの設定用
-    rs2::pipeline_profile pipeline_profile; // パイプラインの中身参照用
-
     // コンフィグの中身設定
-    config.enable_device(config_read->GetStringProperty("Camera_ID" + str_int)); // デバイスのシリアル指定
-    config.enable_stream(rs2_stream::RS2_STREAM_COLOR, m_xres, m_yres, rs2_format::RS2_FORMAT_BGR8, m_sndfps); // RGBカメラ有効化
-    config.enable_stream(rs2_stream::RS2_STREAM_DEPTH, m_xres, m_yres, rs2_format::RS2_FORMAT_Z16, m_sndfps); // Depthカメラ有効化
-    config.enable_stream(rs2_stream::RS2_STREAM_INFRARED, 1, m_xres, m_yres, rs2_format::RS2_FORMAT_Y8, m_sndfps); // IRカメラ有効化
-    config.enable_stream(rs2_stream::RS2_STREAM_INFRARED, 2, m_xres, m_yres, rs2_format::RS2_FORMAT_Y8, m_sndfps); // IRカメラ有効化
-
-
-    // パイプラインスタート
-    pipeline_profile = m_pipeline.start(config);
+    m_config.enable_device(config_read->GetStringProperty("Camera_ID" + str_int)); // デバイスのシリアル指定
+    m_config.enable_stream(rs2_stream::RS2_STREAM_COLOR, m_xres, m_yres, rs2_format::RS2_FORMAT_BGR8, m_sndfps); // RGBカメラ有効化
+    m_config.enable_stream(rs2_stream::RS2_STREAM_DEPTH, m_xres, m_yres, rs2_format::RS2_FORMAT_Z16, m_sndfps); // Depthカメラ有効化
+    m_config.enable_stream(rs2_stream::RS2_STREAM_INFRARED, 1, m_xres, m_yres, rs2_format::RS2_FORMAT_Y8, m_sndfps); // IRカメラ有効化
+    m_config.enable_stream(rs2_stream::RS2_STREAM_INFRARED, 2, m_xres, m_yres, rs2_format::RS2_FORMAT_Y8, m_sndfps); // IRカメラ有効化
 
     delete config_read;
 }
@@ -52,39 +45,63 @@ void RealSense::setCameraMode(cameraMode _camera_mode)
  */
 cv::Mat RealSense::getFrame()
 {
-    rs2::frameset frameset;
-    rs2::frame frame;
-    //フレームを得る
-    frameset = m_pipeline.wait_for_frames();
-    //空フレーム時に単色を出力する
-    cv::Mat mat_frame(cv::Size(m_xres, m_yres), CV_8UC3, cv::Scalar(0, 0, 255));
-    cv::Mat rgba_frame;
-    switch (camera_mode) {
-        case cameraMode::RGB:
-            frame = frameset.get_color_frame();
-            mat_frame = cv::Mat(m_yres, m_xres, CV_8UC3, const_cast<void*>(frame.get_data()));
-            cv::cvtColor(mat_frame, rgba_frame, cv::COLOR_BGR2BGRA);
-            break;
-        case cameraMode::DEPTH:
-            frame = frameset.get_depth_frame();
-            frame = frame.apply_filter(color_map);
-            mat_frame = cv::Mat(m_yres, m_xres, CV_8UC3, const_cast<void*>(frame.get_data()));
-            cv::cvtColor(mat_frame, rgba_frame, cv::COLOR_BGR2BGRA);
-            break;
-        case cameraMode::IR_LEFT:
-            frame = frameset.get_infrared_frame(1);
+    if(!open_failed) {
+        rs2::frameset frameset;
+        rs2::frame frame;
+        //フレームを得る
+        frameset = m_pipeline.wait_for_frames();
+        //空フレーム時に単色を出力する
+        cv::Mat mat_frame(cv::Size(m_xres, m_yres), CV_8UC3, cv::Scalar(0, 0, 255));
+        cv::Mat rgba_frame;
+        switch (camera_mode) {
+            case cameraMode::RGB:
+                frame = frameset.get_color_frame();
+                mat_frame = cv::Mat(m_yres, m_xres, CV_8UC3, const_cast<void*>(frame.get_data()));
+                cv::cvtColor(mat_frame, rgba_frame, cv::COLOR_BGR2BGRA);
+                break;
+            case cameraMode::DEPTH:
+                frame = frameset.get_depth_frame();
+                frame = frame.apply_filter(color_map);
+                mat_frame = cv::Mat(m_yres, m_xres, CV_8UC3, const_cast<void*>(frame.get_data()));
+                cv::cvtColor(mat_frame, rgba_frame, cv::COLOR_BGR2BGRA);
+                break;
+            case cameraMode::IR_LEFT:
+                frame = frameset.get_infrared_frame(1);
+                mat_frame = cv::Mat(m_yres, m_xres, CV_8UC1, const_cast<void*>(frame.get_data()));
+                cv::cvtColor(mat_frame, rgba_frame, cv::COLOR_GRAY2BGRA);
+                break;
+            case cameraMode::IR_RIGHT:
+                frame = frameset.get_infrared_frame(2);
             mat_frame = cv::Mat(m_yres, m_xres, CV_8UC1, const_cast<void*>(frame.get_data()));
-            cv::cvtColor(mat_frame, rgba_frame, cv::COLOR_GRAY2BGRA);
-            break;
-        case cameraMode::IR_RIGHT:
-            frame = frameset.get_infrared_frame(2);
-            mat_frame = cv::Mat(m_yres, m_xres, CV_8UC1, const_cast<void*>(frame.get_data()));
-            cv::cvtColor(mat_frame, rgba_frame, cv::COLOR_GRAY2BGRA);
-            break;
+                cv::cvtColor(mat_frame, rgba_frame, cv::COLOR_GRAY2BGRA);
+                break;
 
-        default:
-            cv::cvtColor(mat_frame, rgba_frame, cv::COLOR_BGR2BGRA);
-            break;
+            default:
+                cv::cvtColor(mat_frame, rgba_frame, cv::COLOR_BGR2BGRA);
+                break;
+        }
+
+        return rgba_frame;
+    }else{
+        return cv::Mat(cv::Size(m_xres, m_yres), CV_8UC4, cv::Scalar(0, 0, 255, 255));
     }
-    return rgba_frame;
+}
+
+void RealSense::atatch(void)
+{
+    rs2::pipeline_profile pipeline_profile; // パイプラインの中身参照用
+
+    // パイプラインスタート
+    pipeline_profile = m_pipeline.start(m_config);
+    if(!pipeline_profile) {
+//        cerr << "cannot open " << USBCam_path << endl;
+        open_failed = true;
+    } else {
+        open_failed = false;
+    }
+}
+
+void RealSense::detatch(void)
+{
+    m_pipeline.stop();
 }

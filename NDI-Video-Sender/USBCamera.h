@@ -15,6 +15,11 @@ public:
     cv::Mat getFrame() override;
 
     void setCameraMode(cameraMode _camera_mode) override;
+
+    void atatch(void) override;
+
+    void detatch(void) override;
+
 private:
     std::string USBCam_path;
     //キャプチャハンドル
