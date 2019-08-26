@@ -13,7 +13,6 @@ USBCamera::USBCamera(int camera_number):VideoSource(camera_number)
     str_int += to_string(camera_number); // 指定したカメラ番号を格納
 
     USBCam_path = config_read->GetStringProperty("Camera_ID" + str_int);
-    delete config_read;
 
     //デバイスを開く
     capture = new cv::VideoCapture();
