@@ -55,10 +55,14 @@ void VideoSourceManager::registSender(int sender_number) {
  * @return 切り替えに成功した場合true/失敗するとfalse
  */
 bool VideoSourceManager::requestVideoSource(int sender_number, int camera_number) {
+    bool successful_replace = false;
     //同時書き込み防止のためロック
     m.lock();
     bimap_t::right_iterator itr = thread_camera_map.right.find(thread_camera_map.left.at(sender_number));
-    const bool successful_replace = thread_camera_map.right.replace_key(itr, camera_number - 1);
+    if(camera_number <=  sources->size())
+    {
+        successful_replace = thread_camera_map.right.replace_key(itr, camera_number - 1);
+    }
     m.unlock();
     return successful_replace;
 }
