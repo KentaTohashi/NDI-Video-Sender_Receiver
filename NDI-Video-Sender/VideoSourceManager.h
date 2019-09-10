@@ -26,7 +26,11 @@ public:
 
     ~VideoSourceManager();
 
-    void addVideoSource(int camera_numbeer);
+    void addVideoSource(int camera_number);
+
+    void atatchCamera(int camera_number);
+
+    void detatchCamera(int camera_number);
 
     void registSender(int sender_number);
 

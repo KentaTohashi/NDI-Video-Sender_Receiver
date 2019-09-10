@@ -13,37 +13,18 @@ USBCamera::USBCamera(int camera_number):VideoSource(camera_number)
     str_int += to_string(camera_number); // 指定したカメラ番号を格納
 
     USBCam_path = config_read->GetStringProperty("Camera_ID" + str_int);
-    delete config_read;
 
     //デバイスを開く
     capture = new cv::VideoCapture();
-    capture->open(USBCam_path, cv::CAP_V4L);
 
-    if (!capture->isOpened()) {
-        cerr << "cannot open No." << camera_number << " camera" << endl;
-        open_failed = true;
-    }else{
-        open_failed = false;
-    }
-
-    capture->set(cv::CAP_PROP_FRAME_WIDTH, m_xres);  // 幅
-    capture->set(cv::CAP_PROP_FRAME_HEIGHT, m_yres); // 高さ
-    capture->set(cv::CAP_PROP_FPS, m_sndfps); // フレームレート
-
-    // フレームサイズ更新（カメラの性能以上要求によるエラー落ち対策）
-    m_xres = (int)capture->get(cv::CAP_PROP_FRAME_WIDTH); // 横方向
-    m_yres = (int)capture->get(cv::CAP_PROP_FRAME_HEIGHT); // 縦方向
-    cv::Mat frame;
-    while(frame.empty()){
-        capture->read(frame);
-    }
+	delete config_read;
 }
 
 
 
 USBCamera::~USBCamera()
 {
-    capture->release();
+    detatch();
     delete capture;
 }
 
@@ -68,4 +49,37 @@ cv::Mat USBCamera::getFrame() {
 void USBCamera::setCameraMode(cameraMode _camera_mode)
 {
     return;
+}
+
+/**
+ * USBカメラデバイスのキャプチャを開始する
+ * @param なし
+ */
+void USBCamera::atatch(void)
+{
+    capture->open(USBCam_path, cv::CAP_V4L);
+
+    if (!capture->isOpened()) {
+        cerr << "cannot open " << USBCam_path << endl;
+        open_failed = true;
+    }else{
+        open_failed = false;
+
+        capture->set(cv::CAP_PROP_FRAME_WIDTH, m_xres);  // 幅
+        capture->set(cv::CAP_PROP_FRAME_HEIGHT, m_yres); // 高さ
+        capture->set(cv::CAP_PROP_FPS, m_sndfps); // フレームレート
+
+        // フレームサイズ更新（カメラの性能以上要求によるエラー落ち対策）
+        m_xres = (int)capture->get(cv::CAP_PROP_FRAME_WIDTH); // 横方向
+        m_yres = (int)capture->get(cv::CAP_PROP_FRAME_HEIGHT); // 縦方向
+    }
+}
+
+/**
+ * USBカメラデバイスのキャプチャを終了する
+ * @param なし
+ */
+void USBCamera::detatch(void)
+{
+    capture->release();
 }

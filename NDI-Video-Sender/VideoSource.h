@@ -29,6 +29,10 @@ public:
 
     virtual cv::Mat getFrame() = 0;
 
+    virtual void atatch(void) = 0;
+
+    virtual void detatch(void) = 0;
+
     // カメラモードの切り替えをすべてのソースに実装する
     //　必要ない場合は何もしない
     virtual void setCameraMode(cameraMode _camera_mode) = 0;

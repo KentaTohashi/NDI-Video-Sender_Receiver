@@ -15,8 +15,11 @@ public:
     ~RealSense();
     void setCameraMode(cameraMode _camera_mode);
     cv::Mat getFrame() override;
+    void atatch(void) override;
+    void detatch(void) override;
 private:
     rs2::pipeline m_pipeline;
+	rs2::config m_config;
     rs2::colorizer color_map;
     int camera_mode;
 };
