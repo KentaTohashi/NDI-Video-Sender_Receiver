@@ -16,9 +16,9 @@ public:
 
     void setCameraMode(cameraMode _camera_mode) override;
 
-    void atatch(void) override;
+    void attach(void) override;
 
-    void detatch(void) override;
+    void detach(void) override;
 
 private:
     std::string USBCam_path;

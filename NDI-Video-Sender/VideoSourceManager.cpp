@@ -44,7 +44,7 @@ void VideoSourceManager::addVideoSource(int camera_number) {
  */
 void VideoSourceManager::atatchCamera(int camera_number)
 {
-	sources->at(camera_number - 1)->atatch();
+    sources->at(camera_number - 1)->attach();
 }
 
 /***
@@ -53,7 +53,7 @@ void VideoSourceManager::atatchCamera(int camera_number)
  */
 void VideoSourceManager::detatchCamera(int camera_number)
 {
-	sources->at(camera_number - 1)->detatch();
+    sources->at(camera_number - 1)->detach();
 }
 
 /***

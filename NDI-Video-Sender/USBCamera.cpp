@@ -24,7 +24,7 @@ USBCamera::USBCamera(int camera_number):VideoSource(camera_number)
 
 USBCamera::~USBCamera()
 {
-    detatch();
+    detach();
     delete capture;
 }
 
@@ -55,14 +55,13 @@ void USBCamera::setCameraMode(cameraMode _camera_mode)
  * USBカメラデバイスのキャプチャを開始する
  * @param なし
  */
-void USBCamera::atatch(void)
-{
+void USBCamera::attach(void) {
     capture->open(USBCam_path, cv::CAP_V4L);
 
     if (!capture->isOpened()) {
         cerr << "cannot open " << USBCam_path << endl;
         open_failed = true;
-    }else{
+    } else {
         open_failed = false;
 
         capture->set(cv::CAP_PROP_FRAME_WIDTH, m_xres);  // 幅
@@ -79,7 +78,6 @@ void USBCamera::atatch(void)
  * USBカメラデバイスのキャプチャを終了する
  * @param なし
  */
-void USBCamera::detatch(void)
-{
+void USBCamera::detach(void) {
     capture->release();
 }

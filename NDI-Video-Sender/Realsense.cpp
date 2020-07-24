@@ -87,13 +87,12 @@ cv::Mat RealSense::getFrame()
     }
 }
 
-void RealSense::atatch(void)
-{
+void RealSense::attach(void) {
     rs2::pipeline_profile pipeline_profile; // パイプラインの中身参照用
 
     // パイプラインスタート
     pipeline_profile = m_pipeline.start(m_config);
-    if(!pipeline_profile) {
+    if (!pipeline_profile) {
 //        cerr << "cannot open " << USBCam_path << endl;
         open_failed = true;
     } else {
@@ -101,7 +100,6 @@ void RealSense::atatch(void)
     }
 }
 
-void RealSense::detatch(void)
-{
+void RealSense::detach(void) {
     m_pipeline.stop();
 }
