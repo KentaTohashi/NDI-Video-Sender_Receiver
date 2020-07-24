@@ -36,10 +36,18 @@ public:
     // カメラモードの切り替えをすべてのソースに実装する
     //　必要ない場合は何もしない
     virtual void setCameraMode(cameraMode _camera_mode) = 0;
+
 protected:
     int m_xres; // x解像度
     int m_yres; // y解像度
     int m_sndfps; // FPS指定用
     bool open_failed;
+    int camera_number;
+
+    cv::Mat getErrorFrame() const;
+
+    string getFailedToOpenMessage() const;
+
+    string getFailedToGetFrameMessage() const;
 };
 

@@ -20,6 +20,30 @@ VideoSource::VideoSource(int camera_number)
 }
 
 
-VideoSource::~VideoSource()
-{
+VideoSource::~VideoSource() {
+}
+
+/***
+ * エラーが発生した際のダミーフレームを返す
+ * @return 青一色のフレーム
+ */
+cv::Mat VideoSource::getErrorFrame() const {
+    return cv::Mat(cv::Size(m_xres, m_yres), CV_8UC4, cv::Scalar(255, 0, 0, 255));
+}
+
+/***
+ * カメラを開けなかった場合のエラーメッセージを得る
+ * @return エラーメッセージ
+ */
+string VideoSource::getFailedToOpenMessage() const {
+    return "Failed to open No." + to_string(camera_number) + " camera";
+}
+
+/***
+ * フレームを得られなかった場合のエラーメッセージを得る
+ * @return エラーメッセージ
+ */
+string VideoSource::getFailedToGetFrameMessage() const {
+
+    return "Failed to get frame from No." + to_string(camera_number) + " camera";
 }

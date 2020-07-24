@@ -16,12 +16,18 @@ RealSense::RealSense(int camera_number):VideoSource(camera_number)
 
     // コンフィグの中身設定
     m_config.enable_device(config_read->GetStringProperty("Camera_ID" + str_int)); // デバイスのシリアル指定
-    m_config.enable_stream(rs2_stream::RS2_STREAM_COLOR, m_xres, m_yres, rs2_format::RS2_FORMAT_BGR8, m_sndfps); // RGBカメラ有効化
-    m_config.enable_stream(rs2_stream::RS2_STREAM_DEPTH, m_xres, m_yres, rs2_format::RS2_FORMAT_Z16, m_sndfps); // Depthカメラ有効化
-    m_config.enable_stream(rs2_stream::RS2_STREAM_INFRARED, 1, m_xres, m_yres, rs2_format::RS2_FORMAT_Y8, m_sndfps); // IRカメラ有効化
-    m_config.enable_stream(rs2_stream::RS2_STREAM_INFRARED, 2, m_xres, m_yres, rs2_format::RS2_FORMAT_Y8, m_sndfps); // IRカメラ有効化
+    m_config.enable_stream(rs2_stream::RS2_STREAM_COLOR, m_xres, m_yres, rs2_format::RS2_FORMAT_BGR8,
+                           m_sndfps); // RGBカメラ有効化
+    m_config.enable_stream(rs2_stream::RS2_STREAM_DEPTH, m_xres, m_yres, rs2_format::RS2_FORMAT_Z16,
+                           m_sndfps); // Depthカメラ有効化
+    m_config.enable_stream(rs2_stream::RS2_STREAM_INFRARED, 1, m_xres, m_yres, rs2_format::RS2_FORMAT_Y8,
+                           m_sndfps); // IRカメラ有効化
+    m_config.enable_stream(rs2_stream::RS2_STREAM_INFRARED, 2, m_xres, m_yres, rs2_format::RS2_FORMAT_Y8,
+                           m_sndfps); // IRカメラ有効化
 
     delete config_read;
+
+    this->camera_number = camera_number;
 }
 
 
@@ -49,14 +55,22 @@ cv::Mat RealSense::getFrame()
         rs2::frameset frameset;
         rs2::frame frame;
         //フレームを得る
-        frameset = m_pipeline.wait_for_frames();
+        //エラーが発生した場合にはカメラを無効化する。
+        try {
+            frameset = m_pipeline.wait_for_frames();
+        } catch (const rs2::error &e) {
+            open_failed = true;
+            cerr << getFailedToGetFrameMessage() << endl;
+            return getErrorFrame();
+        }
+
         //空フレーム時に単色を出力する
-        cv::Mat mat_frame(cv::Size(m_xres, m_yres), CV_8UC3, cv::Scalar(0, 0, 255));
+        cv::Mat mat_frame(cv::Size(m_xres, m_yres), CV_8UC3, cv::Scalar(255, 0, 0));
         cv::Mat rgba_frame;
         switch (camera_mode) {
             case cameraMode::RGB:
                 frame = frameset.get_color_frame();
-                mat_frame = cv::Mat(m_yres, m_xres, CV_8UC3, const_cast<void*>(frame.get_data()));
+                mat_frame = cv::Mat(m_yres, m_xres, CV_8UC3, const_cast<void *>(frame.get_data()));
                 cv::cvtColor(mat_frame, rgba_frame, cv::COLOR_BGR2BGRA);
                 break;
             case cameraMode::DEPTH:
@@ -83,7 +97,7 @@ cv::Mat RealSense::getFrame()
 
         return rgba_frame;
     }else{
-        return cv::Mat(cv::Size(m_xres, m_yres), CV_8UC4, cv::Scalar(0, 0, 255, 255));
+        return getErrorFrame();
     }
 }
 
@@ -91,13 +105,14 @@ void RealSense::attach(void) {
     rs2::pipeline_profile pipeline_profile; // パイプラインの中身参照用
 
     // パイプラインスタート
-    pipeline_profile = m_pipeline.start(m_config);
-    if (!pipeline_profile) {
-//        cerr << "cannot open " << USBCam_path << endl;
+    try {
+        pipeline_profile = m_pipeline.start(m_config);
+    } catch (const rs2::error &e) {
         open_failed = true;
-    } else {
-        open_failed = false;
+        cerr << getFailedToOpenMessage() << endl;
+        return;
     }
+    open_failed = !pipeline_profile;
 }
 
 void RealSense::detach(void) {

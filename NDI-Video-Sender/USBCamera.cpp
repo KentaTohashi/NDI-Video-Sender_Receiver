@@ -36,13 +36,26 @@ cv::Mat USBCamera::getFrame() {
     if(!open_failed) {
         cv::Mat frame;
         cv::Mat bgra_frame;
-        while (frame.empty()) {
-            capture->read(frame);
+        int fail_count = 0;
+        //読み込み失敗回数を数え、連続で失敗した場合にはカメラに接続できないとみなす
+        while (fail_count <= 5 && frame.empty()) {
+            if (!capture->read(frame)) {
+                fail_count++;
+            } else {
+                break;
+            }
+        }
+        //連続で失敗したことを検知した場合、カメラを無効化する。
+        if (fail_count >= 5) {
+            open_failed = true;
+            cerr << getFailedToGetFrameMessage() << endl;
+            capture->release();
+            return getErrorFrame();
         }
         cv::cvtColor(frame, bgra_frame, cv::COLOR_BGR2BGRA);
         return bgra_frame;
     }else{
-        return cv::Mat(cv::Size(m_xres, m_yres), CV_8UC4, cv::Scalar(0, 0, 255, 255));
+        return getErrorFrame();
     }
 }
 
@@ -59,8 +72,9 @@ void USBCamera::attach(void) {
     capture->open(USBCam_path, cv::CAP_V4L);
 
     if (!capture->isOpened()) {
-        cerr << "cannot open " << USBCam_path << endl;
+        cerr << getFailedToOpenMessage() << endl;
         open_failed = true;
+        capture->release();
     } else {
         open_failed = false;
 
