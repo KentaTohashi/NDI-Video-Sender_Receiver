@@ -3,13 +3,13 @@
 
 開発/実行環境について  
 -------------------
- * OS：Ubuntu 16.04 LTS  
+ * OS：Ubuntu 18.04 LTS  
 
- * コンパイラ：gcc 　バージョン5.4.0  
+ * コンパイラ：gcc 　バージョン7.4.0  
 
  * 使用ライブラリ ：   
-Newtek NDI　バージョン3.8  
-OpenCV　バージョン4.1.0  
+Newtek NDI　バージョン4.1 
+OpenCV　バージョン4.3.0  
 RealSense バージョン 2.0 (buildバージョン ～2.16.0)  
 ZBar バージョン 0.10
 開発環境のセットアップ  
@@ -30,23 +30,26 @@ ZBar バージョン 0.10
 zbarのインストール 
 --------------------
 ```bash
-# apt install libzbar0 libzbar0-dev
+# apt install libzbar0 libzbar-dev
 ```
 
-Boostrのインストール 
+Boostのインストール 
 --------------------
 ```bash
 # apt install libboost-all-dev
 ```
-NewTek NDI SDK v3.5のインストール  
+NewTek NDI SDK v4.1のインストール  
 --------------------
-**1、NewTek NDI SDK v3.5をダウンロード**  
+**1、NewTek NDI SDK v4.1をダウンロード**  
  以下よりダウンロードを行います。  
 https://jp.newtek.com/ndi/sdk/  
 ダウンロード時に名前やメールアドレスなどの送信が必要です。  
 
+**NDI SDKは常時最新版しかダウンロードできないため、必要に応じてバックアップを
+取ってください。**
+
 **2、インストール**  
- ダウンロードされたInstallNDISDK\_v3\_Linux.shを、NDIをインストールしたいフォルダにコピーします。  
+ ダウンロードされたInstallNDISDK\_v4\_Linux.shを、NDIをインストールしたいフォルダにコピーします。  
  ターミナル上で以下のコマンドを入力します。  
 ```bash
 $ cd “コピーしたディレクトリ”  
@@ -69,7 +72,7 @@ include_dir=${prefix}/include
 
 Name: libNDI
 Description:Multimedia transmit library
-Version: 3.5.0
+Version: 4.1.0
 Libs: -L${exec_prefix}/lib/x86_64-linux-gnu -lndi
 Cflags: -I${include_dir}
 ```
@@ -79,7 +82,7 @@ pkg-configの読み取りパスに追加します。以下の内容を`~/.profil
 export PKG_CONFIG_PATH=/<path to NDI>/lib/x86_64-linux-gnu/pkgconfig:$PKG_CONFIG_PATH
 ```
 
-OpenCV v4.1.0のインストール
+OpenCV v4.3.0のインストール
 --------------------
 **1、画像表示ライブラリと画像フォーマットのインストール**  
 ターミナル上で以下のコマンドを実行します。  
@@ -110,13 +113,13 @@ OpenCV v4.1.0のインストール
 ```bash
 $ git clone https://github.com/opencv/opencv.git  
 $ cd opencv  
-$ git checkout 4.1.0  
+$ git checkout 4.3.0  
 ```
 **6、OpenCVのインストール先フォルダを作成する**
 OpenCVのバージョンアップ等のため、インストール先を指定します。
-ここでは`/opt/opencv410`にインストールすると仮定します。
+ここでは`/opt/opencv430`にインストールすると仮定します。
 ```bash
-# mkdir /opt/opencv410
+# mkdir /opt/opencv430
 ```
 **7、Cmakeを実行する**  
  ターミナル上で以下のコマンドを実行します。  
@@ -139,7 +142,7 @@ $ make
 **9、OpenCVを適用させる**  
  ターミナル上で以下のコマンドを実行します。  
 ```bash  
-# echo "/opt/opencv410/lib" > /etc/ld.so.conf.d/opencv.conf 
+# echo "/opt/opencv430/lib" > /etc/ld.so.conf.d/opencv.conf 
 $ sudo ldconfig  
 ```
 pkg-configとcmakeのパスを登録します。以下の内容を`~/.profile`に追加してください。
